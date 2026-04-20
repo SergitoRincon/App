@@ -9,9 +9,8 @@ import httpx
 from pathlib import Path
 
 # ── URL del backend ────────────────────────────────────────────────
-#API_URL = "https://motoapp-backend.onrender.com"   # producción (Render gratis)
-API_URL = "https://motoapp-xjlt.onrender.com"
-API_URL = "http://localhost:8001"                 # desarrollo local
+API_URL = "https://motoapp-xjlt.onrender.com"   # producción (Render gratis)
+# API_URL = "http://localhost:8000"                 # desarrollo local
 
 TOKEN_FILE = Path.home() / ".motoapp_session.json"
 
@@ -75,10 +74,14 @@ def _get(endpoint: str) -> dict:
         r.raise_for_status()
         return {"ok": True, "data": r.json()}
     except httpx.HTTPStatusError as e:
-        return {"ok": False, "error": e.response.json().get("detail", "Error del servidor")}
+        try:
+            detail = e.response.json().get("detail", "Error del servidor")
+        except Exception:
+            detail = f"Error {e.response.status_code}"
+        return {"ok": False, "error": detail}
     except httpx.TimeoutException:
         return {"ok": False, "error": "El servidor tardó en responder. Intenta de nuevo."}
-    except Exception as e:
+    except Exception:
         return {"ok": False, "error": "Sin conexión a internet"}
 
 def _post(endpoint: str, body: dict) -> dict:
@@ -87,7 +90,11 @@ def _post(endpoint: str, body: dict) -> dict:
         r.raise_for_status()
         return {"ok": True, "data": r.json()}
     except httpx.HTTPStatusError as e:
-        return {"ok": False, "error": e.response.json().get("detail", "Error del servidor")}
+        try:
+            detail = e.response.json().get("detail", "Error del servidor")
+        except Exception:
+            detail = f"Error {e.response.status_code}"
+        return {"ok": False, "error": detail}
     except httpx.TimeoutException:
         return {"ok": False, "error": "El servidor tardó en responder. Intenta de nuevo."}
     except Exception:
@@ -99,7 +106,11 @@ def _patch(endpoint: str, body: dict) -> dict:
         r.raise_for_status()
         return {"ok": True, "data": r.json()}
     except httpx.HTTPStatusError as e:
-        return {"ok": False, "error": e.response.json().get("detail", "Error del servidor")}
+        try:
+            detail = e.response.json().get("detail", "Error del servidor")
+        except Exception:
+            detail = f"Error {e.response.status_code}"
+        return {"ok": False, "error": detail}
     except Exception:
         return {"ok": False, "error": "Sin conexión a internet"}
 
@@ -109,7 +120,11 @@ def _delete(endpoint: str) -> dict:
         r.raise_for_status()
         return {"ok": True, "data": {}}
     except httpx.HTTPStatusError as e:
-        return {"ok": False, "error": e.response.json().get("detail", "Error del servidor")}
+        try:
+            detail = e.response.json().get("detail", "Error del servidor")
+        except Exception:
+            detail = f"Error {e.response.status_code}"
+        return {"ok": False, "error": detail}
     except Exception:
         return {"ok": False, "error": "Sin conexión a internet"}
 
@@ -145,6 +160,10 @@ def login(email: str, password: str) -> dict:
 
 def get_perfil() -> dict:
     return _get("/usuarios/me")
+
+def actualizar_perfil(datos: dict) -> dict:
+    return _patch("/usuarios/me/perfil", datos)
+
 
 def get_configuracion() -> dict:
     return _get("/usuarios/me/configuracion")

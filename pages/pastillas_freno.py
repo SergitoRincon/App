@@ -1,22 +1,56 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-
-    def pastilla(titulo):
-        return [
-            section_title(titulo, c),
-            text_field("Marca", "Ej: Brembo, EBC, Ferodo...", ft.Icons.LABEL, c),
-            text_field("Referencia", "Ej: FA135...", ft.Icons.NUMBERS, c),
-            date_field("Último cambio", c),
-            text_field("Kilometraje en el cambio", "Ej: 8450", ft.Icons.SPEED, c),
-            text_field("Próximo cambio (km)", "Ej: 18450", ft.Icons.UPCOMING, c),
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.DISC_FULL, "Pastillas de freno", "pastillas_freno", vehiculo_id_ref,
+        [
+            ("PASTILLA DELANTERA", [
+                ("marca_del", ft.TextField(label="Marca", hint_text="Ej: Brembo, EBC...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("ref_del", ft.TextField(label="Referencia", hint_text="Ej: FA135...",
+                                prefix_icon=ft.Icons.NUMBERS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("fecha_del", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_del", ft.TextField(label="Km en el cambio", hint_text="Ej: 8450",
+                                prefix_icon=ft.Icons.SPEED,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+            ("PASTILLA TRASERA", [
+                ("marca_tra", ft.TextField(label="Marca", hint_text="Ej: Brembo, EBC...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("ref_tra", ft.TextField(label="Referencia", hint_text="Ej: FA135...",
+                                prefix_icon=ft.Icons.NUMBERS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("fecha_tra", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_tra", ft.TextField(label="Km en el cambio", hint_text="Ej: 8450",
+                                prefix_icon=ft.Icons.SPEED,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
         ]
-
-    return build_subpage(page, C, go_home, ft.Icons.DISC_FULL, "Pastillas de freno", [
-        *pastilla("PASTILLA DELANTERA"),
-        *pastilla("PASTILLA TRASERA"),
-        save_btn(c),
-    ])
+    )

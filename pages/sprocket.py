@@ -1,31 +1,41 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-    return build_subpage(page, C, go_home, ft.Icons.SETTINGS_APPLICATIONS, "Sprocket", [
-        section_title("INFORMACIÓN", c),
-        text_field("Marca", "Ej: JT, Renthal, Sunstar...", ft.Icons.LABEL, c),
-        text_field("Referencia / Número de dientes", "Ej: JTR1590.42", ft.Icons.NUMBERS, c),
-        section_title("MANTENIMIENTO", c),
-        date_field("Última revisión", c),
-        text_field("Kilometraje en revisión", "Ej: 8450", ft.Icons.SPEED, c),
-        text_field("Próxima revisión (km)", "Ej: 10000", ft.Icons.UPCOMING, c),
-        ft.Container(
-            margin=ft.Margin(16, 0, 16, 10),
-            padding=ft.Padding(16, 14, 16, 14),
-            border_radius=12,
-            bgcolor=c["CARD"],
-            border=ft.border.all(1, c["BORDER"]),
-            content=ft.Column(spacing=8, controls=[
-                ft.Text("Estado", color=c["GRAY"], size=13),
-                ft.Row(spacing=8, controls=[
-                    ft.ElevatedButton("Bueno",   bgcolor="#1E4A90D9", color=c["ACCENT"]),
-                    ft.ElevatedButton("Regular", bgcolor=c["CARD"],   color=c["GRAY"]),
-                    ft.ElevatedButton("Cambiar", bgcolor=c["CARD"],   color=c["GRAY"]),
-                ]),
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.SETTINGS_APPLICATIONS, "Sprocket", "sprocket", vehiculo_id_ref,
+        [
+            ("INFORMACIÓN", [
+                ("marca", ft.TextField(label="Marca", hint_text="Ej: JT, Renthal...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("referencia", ft.TextField(label="Referencia / Dientes", hint_text="Ej: JTR1590.42",
+                                prefix_icon=ft.Icons.NUMBERS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
             ]),
-        ),
-        save_btn(c),
-    ])
+            ("MANTENIMIENTO", [
+                ("fecha_rev", ft.TextField(label="Última revisión", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_rev", ft.TextField(label="Km en la revisión", hint_text="Ej: 8450",
+                                prefix_icon=ft.Icons.SPEED,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_proximo", ft.TextField(label="Próxima revisión (km)", hint_text="Ej: 10000",
+                                prefix_icon=ft.Icons.UPCOMING,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+        ]
+    )

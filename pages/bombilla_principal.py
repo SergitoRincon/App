@@ -1,30 +1,36 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-    return build_subpage(page, C, go_home, ft.Icons.LIGHT_MODE, "Bombilla principal", [
-        section_title("INFORMACIÓN", c),
-        ft.Container(
-            margin=ft.Margin(16, 0, 16, 10),
-            content=ft.Dropdown(
-                label="Tipo de bombilla",
-                options=[
-                    ft.dropdown.Option("Halógena"),
-                    ft.dropdown.Option("LED"),
-                    ft.dropdown.Option("HID / Xenón"),
-                    ft.dropdown.Option("Incandescente"),
-                ],
-                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
-                label_style=ft.TextStyle(color=c["GRAY"]),
-                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10,
-            ),
-        ),
-        text_field("Marca", "Ej: Philips, Osram, Bosch...", ft.Icons.LABEL, c),
-        text_field("Referencia / Potencia", "Ej: H4 60/55W...", ft.Icons.NUMBERS, c),
-        section_title("CAMBIO / REVISIÓN", c),
-        date_field("Último cambio", c),
-        text_field("Próximo cambio estimado", "Ej: 2026", ft.Icons.UPCOMING, c),
-        save_btn(c),
-    ])
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.LIGHT_MODE, "Bombilla principal", "bombilla_principal", vehiculo_id_ref,
+        [
+            ("INFORMACIÓN", [
+                ("tipo", ft.TextField(label="Tipo", hint_text="Ej: Halógena, LED, HID...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("marca", ft.TextField(label="Marca", hint_text="Ej: Philips, Osram...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("referencia", ft.TextField(label="Referencia / Potencia", hint_text="Ej: H4 60/55W...",
+                                prefix_icon=ft.Icons.NUMBERS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+            ("CAMBIO", [
+                ("fecha_cambio", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+        ]
+    )

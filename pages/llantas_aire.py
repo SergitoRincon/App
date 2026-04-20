@@ -1,23 +1,46 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-
-    def llanta_section(titulo):
-        return [
-            section_title(titulo, c),
-            text_field("Marca", "Ej: Pirelli, Michelin...", ft.Icons.LABEL, c),
-            text_field("Referencia", "Ej: 110/70-17...", ft.Icons.NUMBERS, c),
-            text_field("Presión recomendada (PSI)", "Ej: 32 PSI", ft.Icons.COMPRESS, c),
-            text_field("Presión actual (PSI)", "Ej: 30 PSI", ft.Icons.COMPRESS, c),
-            date_field("Último cambio", c),
-            text_field("Porta sprocket (si aplica)", "Ej: 42 dientes", ft.Icons.SETTINGS, c),
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.TIRE_REPAIR, "Llantas de aire", "llantas_aire", vehiculo_id_ref,
+        [
+            ("DELANTERA", [
+                ("pres_rec_del", ft.TextField(label="Presión recomendada (PSI)", hint_text="Ej: 32",
+                                prefix_icon=ft.Icons.COMPRESS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("pres_act_del", ft.TextField(label="Presión actual (PSI)", hint_text="Ej: 30",
+                                prefix_icon=ft.Icons.COMPRESS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("fecha_del", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+            ("TRASERA", [
+                ("pres_rec_tra", ft.TextField(label="Presión recomendada (PSI)", hint_text="Ej: 36",
+                                prefix_icon=ft.Icons.COMPRESS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("pres_act_tra", ft.TextField(label="Presión actual (PSI)", hint_text="Ej: 34",
+                                prefix_icon=ft.Icons.COMPRESS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("fecha_tra", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
         ]
-
-    return build_subpage(page, C, go_home, ft.Icons.TIRE_REPAIR, "Llantas de aire", [
-        *llanta_section("LLANTA DELANTERA"),
-        *llanta_section("LLANTA TRASERA"),
-        save_btn(c),
-    ])
+    )

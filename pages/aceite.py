@@ -1,35 +1,45 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
-
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-    return build_subpage(page, C, go_home, ft.Icons.OIL_BARREL, "Aceite", [
-        section_title("INFORMACIÓN DEL ACEITE", c),
-        text_field("Marca del aceite", "Ej: Castrol, Mobil, Shell...", ft.Icons.LABEL, c),
-        text_field("Referencia", "Ej: 10W40, 20W50...", ft.Icons.NUMBERS, c),
-        section_title("CAMBIO DE ACEITE", c),
-        date_field("Fecha del último cambio", c),
-        text_field("Kilometraje en el cambio", "Ej: 8450", ft.Icons.SPEED, c),
-        text_field("Próximo cambio (km)", "Ej: 9450", ft.Icons.UPCOMING, c),
-        section_title("NIVEL DE ACEITE", c),
-        ft.Container(
-            margin=ft.Margin(16, 0, 16, 10),
-            padding=ft.Padding(16, 14, 16, 14),
-            border_radius=12,
-            bgcolor=c["CARD"],
-            border=ft.border.all(1, c["BORDER"]),
-            content=ft.Column(spacing=10, controls=[
-                ft.Text("Nivel actual", color=c["GRAY"], size=13),
-                ft.Slider(min=0, max=100, value=80,
-                          active_color=c["ACCENT"], inactive_color=c["BAR"],
-                          divisions=4, label="{value}%"),
-                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[
-                    ft.Text("Bajo",   color=c["GRAY"], size=11),
-                    ft.Text("Normal", color=c["GRAY"], size=11),
-                    ft.Text("Alto",   color=c["GRAY"], size=11),
-                ]),
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.OIL_BARREL, "Aceite", "aceite", vehiculo_id_ref,
+        [
+            ("INFORMACIÓN DEL ACEITE", [
+                ("marca",      ft.TextField(label="Marca", hint_text="Ej: Castrol, Mobil...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("referencia", ft.TextField(label="Referencia", hint_text="Ej: 10W40, 20W50...",
+                                prefix_icon=ft.Icons.NUMBERS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
             ]),
-        ),
-        save_btn(c),
-    ])
+            ("CAMBIO DE ACEITE", [
+                ("fecha_cambio",    ft.TextField(label="Fecha último cambio", hint_text="DD/MM/AAAA",
+                                    prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                    border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                    label_style=ft.TextStyle(color=c["GRAY"]),
+                                    color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_cambio",       ft.TextField(label="Km en el cambio", hint_text="Ej: 8450",
+                                    prefix_icon=ft.Icons.SPEED,
+                                    border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                    label_style=ft.TextStyle(color=c["GRAY"]),
+                                    color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_proximo",      ft.TextField(label="Próximo cambio (km)", hint_text="Ej: 9450",
+                                    prefix_icon=ft.Icons.UPCOMING,
+                                    border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                    label_style=ft.TextStyle(color=c["GRAY"]),
+                                    color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("nivel",           ft.TextField(label="Nivel actual (%)", hint_text="Ej: 80",
+                                    prefix_icon=ft.Icons.WATER_DROP,
+                                    border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                    label_style=ft.TextStyle(color=c["GRAY"]),
+                                    color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+        ]
+    )

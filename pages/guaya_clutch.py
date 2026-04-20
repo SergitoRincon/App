@@ -1,17 +1,46 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-    return build_subpage(page, C, go_home, ft.Icons.CABLE, "Guaya de clutch", [
-        section_title("LUBRICACIÓN", c),
-        date_field("Última lubricación", c),
-        text_field("Producto usado", "Ej: WD-40, aceite 3en1...", ft.Icons.LABEL, c),
-        text_field("Próxima lubricación (km)", "Ej: 9000", ft.Icons.UPCOMING, c),
-        section_title("CAMBIO / REVISIÓN", c),
-        date_field("Último cambio", c),
-        text_field("Kilometraje en el cambio", "Ej: 8450", ft.Icons.SPEED, c),
-        text_field("Próximo cambio (km)", "Ej: 18450", ft.Icons.UPCOMING, c),
-        save_btn(c),
-    ])
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.CABLE, "Guaya de clutch", "guaya_clutch", vehiculo_id_ref,
+        [
+            ("LUBRICACIÓN", [
+                ("fecha_lub", ft.TextField(label="Última lubricación", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("producto_lub", ft.TextField(label="Producto usado", hint_text="Ej: WD-40, aceite 3en1...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_proximo_lub", ft.TextField(label="Próxima lubricación (km)", hint_text="Ej: 9000",
+                                prefix_icon=ft.Icons.UPCOMING,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+            ("CAMBIO / REVISIÓN", [
+                ("fecha_cambio", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_cambio", ft.TextField(label="Km en el cambio", hint_text="Ej: 8450",
+                                prefix_icon=ft.Icons.SPEED,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_proximo", ft.TextField(label="Próximo cambio (km)", hint_text="Ej: 18450",
+                                prefix_icon=ft.Icons.UPCOMING,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+        ]
+    )

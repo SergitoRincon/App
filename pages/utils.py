@@ -17,13 +17,105 @@ def nivel_color(n):
 
 
 def W(page):
-    """Ancho útil de la pantalla."""
-    return page.width or 390
+    w = page.width or 390
+    return w if w > 100 else 390
 
 
+# ── Loading overlay global ────────────────────────────────────────
+_loading_overlay = None
+
+def init_loading(page: ft.Page):
+    global _loading_overlay
+    _loading_overlay = ft.Container(
+        visible=False,
+        expand=True,
+        bgcolor="#80000000",
+        alignment=ft.Alignment(0, 0),
+        content=ft.Container(
+            width=120, height=120,
+            border_radius=16,
+            bgcolor="#2C2C2C",
+            alignment=ft.Alignment(0, 0),
+            content=ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=12,
+                controls=[
+                    ft.ProgressRing(width=40, height=40, color="#4A90D9"),
+                    ft.Text("Cargando...", color="#FFFFFF", size=12),
+                ],
+            ),
+        ),
+    )
+    page.overlay.append(_loading_overlay)
+    return _loading_overlay
+
+def show_loading(page, msg="Cargando..."):
+    if _loading_overlay:
+        _loading_overlay.content.content.controls[1].value = msg
+        _loading_overlay.visible = True
+        page.update()
+
+def hide_loading(page):
+    if _loading_overlay:
+        _loading_overlay.visible = False
+        page.update()
+
+
+# ── Popup de confirmación ─────────────────────────────────────────
+def confirm_dialog(page, titulo, mensaje, on_confirm, c,
+                   btn_confirm="Confirmar", btn_cancel="Cancelar",
+                   danger=False):
+
+    def close_dlg(e=None):
+        dlg.open = False
+        page.update()
+
+    def confirm_and_close(e=None):
+        dlg.open = False
+        page.update()
+        on_confirm()
+
+    dlg = ft.AlertDialog(
+        modal=True,
+        title=ft.Text(titulo, color=c["WHITE"], size=18,
+                      weight=ft.FontWeight.BOLD),
+        content=ft.Text(mensaje, color=c["GRAY"], size=14),
+        actions=[
+            ft.TextButton(
+                btn_cancel,
+                style=ft.ButtonStyle(color=c["GRAY"]),
+                on_click=close_dlg,
+            ),
+            ft.TextButton(
+                btn_confirm,
+                style=ft.ButtonStyle(
+                    color="#F44336" if danger else c["ACCENT"]),
+                on_click=confirm_and_close,
+            ),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+        bgcolor=c["CARD"],
+    )
+    page.overlay.append(dlg)
+    dlg.open = True
+    page.update()
+
+
+# ── Snackbar ──────────────────────────────────────────────────────
+def snack(page, msg, error=False):
+    page.snack_bar = ft.SnackBar(
+        content=ft.Text(msg, color="#FFFFFF"),
+        bgcolor="#F44336" if error else "#4CAF50",
+        duration=3000,
+    )
+    page.snack_bar.open = True
+    page.update()
+
+
+# ── Header de subpágina ───────────────────────────────────────────
 def build_subpage(page, C, go_home, icon_name, title, body_controls):
     c = C()
-    w = W(page)
 
     def _back_hover(e):
         e.control.bgcolor = "#1E4A90D9" if e.data == "true" else ft.Colors.TRANSPARENT
@@ -61,7 +153,8 @@ def build_subpage(page, C, go_home, icon_name, title, body_controls):
     )
 
 
-def info_card(label, value, c, page=None):
+# ── Tarjeta de info ───────────────────────────────────────────────
+def info_card(label, value, c):
     return ft.Container(
         margin=ft.Margin(16, 0, 16, 10),
         padding=ft.Padding(16, 14, 16, 14),
@@ -87,12 +180,13 @@ def section_title(text, c):
     )
 
 
-def text_field(label, hint, icon, c):
+def text_field(label, hint, icon, c, value=""):
     return ft.Container(
         margin=ft.Margin(16, 0, 16, 10),
         content=ft.TextField(
             label=label, hint_text=hint,
             prefix_icon=icon,
+            value=value,
             border_color=c["BORDER"],
             focused_border_color=c["ACCENT"],
             label_style=ft.TextStyle(color=c["GRAY"]),
@@ -103,47 +197,17 @@ def text_field(label, hint, icon, c):
     )
 
 
-def date_field(label, c):
-    return text_field(label, "DD/MM/AAAA", ft.Icons.CALENDAR_TODAY, c)
+def date_field(label, c, value=""):
+    return text_field(label, "DD/MM/AAAA", ft.Icons.CALENDAR_TODAY, c, value)
 
 
-def save_btn(c, on_click=None):
+def save_btn(c, on_click=None, label="Guardar"):
     return ft.Container(
         margin=ft.Margin(16, 8, 16, 0),
-        height=44, border_radius=10,
+        height=46, border_radius=10,
         bgcolor=c["ACCENT"],
         alignment=ft.Alignment(0, 0),
         on_click=on_click,
-        content=ft.Text("Guardar", color="#FFFFFF", size=14,
+        content=ft.Text(label, color="#FFFFFF", size=14,
                         weight=ft.FontWeight.BOLD),
     )
-
-
-def toggle_card(label, subtitle, value, c, on_change=None):
-    return ft.Container(
-        margin=ft.Margin(16, 0, 16, 10),
-        padding=ft.Padding(16, 12, 16, 12),
-        border_radius=12,
-        bgcolor=c["CARD"],
-        border=ft.border.all(1, c["BORDER"]),
-        content=ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                ft.Column(spacing=2, controls=[
-                    ft.Text(label, color=c["WHITE"], size=14),
-                    ft.Text(subtitle, color=c["GRAY"], size=11),
-                ]),
-                ft.Switch(value=value, active_color=c["ACCENT"],
-                          on_change=on_change),
-            ],
-        ),
-    )
-
-
-def snack(page, msg, error=False):
-    page.snack_bar = ft.SnackBar(
-        content=ft.Text(msg, color="#FFFFFF"),
-        bgcolor="#F44336" if error else "#4CAF50",
-    )
-    page.snack_bar.open = True
-    page.update()

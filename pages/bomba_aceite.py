@@ -1,31 +1,41 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn, info_card
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-    return build_subpage(page, C, go_home, ft.Icons.WATER_DROP, "Bomba de aceite", [
-        section_title("INFORMACIÓN", c),
-        info_card("Tipo", "Interna (gear-driven)", c),
-        text_field("Marca / Referencia OEM", "Ej: Honda OEM #15100...", ft.Icons.NUMBERS, c),
-        section_title("REVISIÓN", c),
-        date_field("Última revisión", c),
-        text_field("Kilometraje en revisión", "Ej: 8450", ft.Icons.SPEED, c),
-        text_field("Próxima revisión (km)", "Ej: 28450", ft.Icons.UPCOMING, c),
-        ft.Container(
-            margin=ft.Margin(16, 0, 16, 10),
-            padding=ft.Padding(16, 14, 16, 14),
-            border_radius=12,
-            bgcolor=c["CARD"],
-            border=ft.border.all(1, c["BORDER"]),
-            content=ft.Column(spacing=8, controls=[
-                ft.Text("Estado", color=c["GRAY"], size=13),
-                ft.Row(spacing=8, controls=[
-                    ft.ElevatedButton("Óptimo",  bgcolor="#1E4A90D9", color=c["ACCENT"]),
-                    ft.ElevatedButton("Regular", bgcolor=c["CARD"],   color=c["GRAY"]),
-                    ft.ElevatedButton("Revisar", bgcolor=c["CARD"],   color=c["GRAY"]),
-                ]),
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.WATER_DROP, "Bomba de aceite", "bomba_aceite", vehiculo_id_ref,
+        [
+            ("INFORMACIÓN", [
+                ("referencia", ft.TextField(label="Referencia OEM", hint_text="Ej: Honda #15100...",
+                                prefix_icon=ft.Icons.NUMBERS,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
             ]),
-        ),
-        save_btn(c),
-    ])
+            ("REVISIÓN", [
+                ("fecha_rev", ft.TextField(label="Última revisión", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_rev", ft.TextField(label="Km en la revisión", hint_text="Ej: 8450",
+                                prefix_icon=ft.Icons.SPEED,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_proximo", ft.TextField(label="Próxima revisión (km)", hint_text="Ej: 28450",
+                                prefix_icon=ft.Icons.UPCOMING,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("estado", ft.TextField(label="Estado", hint_text="Ej: Óptimo, Regular...",
+                                prefix_icon=ft.Icons.INFO,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+        ]
+    )

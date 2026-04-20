@@ -1,35 +1,46 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, text_field, date_field, save_btn
+from pages._mant_base import build_mant_page
 
 
-def build(page, C, go_home, navigate_to):
+def build(page, C, go_home, navigate_to, vehiculo_id_ref):
     c = C()
-    bg = "#2C2C2C" if page.platform_brightness == ft.Brightness.DARK else "#FFFFFF"
-    return build_subpage(page, C, go_home, ft.Icons.AIR, "Filtro de aire", [
-        section_title("INFORMACIÓN DEL FILTRO", c),
-        ft.Container(
-            margin=ft.Margin(16, 0, 16, 10),
-            content=ft.Dropdown(
-                label="Tipo de filtro",
-                options=[
-                    ft.dropdown.Option("Papel"),
-                    ft.dropdown.Option("Espuma"),
-                    ft.dropdown.Option("Algodón (K&N)"),
-                    ft.dropdown.Option("Otro"),
-                ],
-                border_color=c["BORDER"],
-                focused_border_color=c["ACCENT"],
-                label_style=ft.TextStyle(color=c["GRAY"]),
-                color=c["WHITE"],
-                bgcolor=c["CARD"],
-                border_radius=10,
-            ),
-        ),
-        text_field("Marca", "Ej: K&N, Mann, Fram...", ft.Icons.LABEL, c),
-        section_title("MANTENIMIENTO", c),
-        date_field("Último cambio", c),
-        date_field("Última revisión", c),
-        text_field("Kilometraje en último cambio", "Ej: 8450", ft.Icons.SPEED, c),
-        text_field("Próximo cambio (km)", "Ej: 10450", ft.Icons.UPCOMING, c),
-        save_btn(c),
-    ])
+    return build_mant_page(
+        page, C, go_home, navigate_to,
+        ft.Icons.AIR, "Filtro de aire", "filtro_aire", vehiculo_id_ref,
+        [
+            ("INFORMACIÓN", [
+                ("tipo", ft.TextField(label="Tipo", hint_text="Ej: Papel, Espuma, K&N...",
+                                prefix_icon=ft.Icons.CATEGORY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("marca", ft.TextField(label="Marca", hint_text="Ej: K&N, Mann, Fram...",
+                                prefix_icon=ft.Icons.LABEL,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+            ("MANTENIMIENTO", [
+                ("fecha_cambio", ft.TextField(label="Último cambio", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("fecha_rev", ft.TextField(label="Última revisión", hint_text="DD/MM/AAAA",
+                                prefix_icon=ft.Icons.CALENDAR_TODAY,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_cambio", ft.TextField(label="Km en el cambio", hint_text="Ej: 8450",
+                                prefix_icon=ft.Icons.SPEED,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+                ("km_proximo", ft.TextField(label="Próximo cambio (km)", hint_text="Ej: 10450",
+                                prefix_icon=ft.Icons.UPCOMING,
+                                border_color=c["BORDER"], focused_border_color=c["ACCENT"],
+                                label_style=ft.TextStyle(color=c["GRAY"]),
+                                color=c["WHITE"], bgcolor=c["CARD"], border_radius=10)),
+            ]),
+        ]
+    )
