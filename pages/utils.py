@@ -16,8 +16,14 @@ def nivel_color(n):
     return f"#{r:02X}{g:02X}{b:02X}"
 
 
+def W(page):
+    """Ancho útil de la pantalla."""
+    return page.width or 390
+
+
 def build_subpage(page, C, go_home, icon_name, title, body_controls):
     c = C()
+    w = W(page)
 
     def _back_hover(e):
         e.control.bgcolor = "#1E4A90D9" if e.data == "true" else ft.Colors.TRANSPARENT
@@ -42,19 +48,20 @@ def build_subpage(page, C, go_home, icon_name, title, body_controls):
                 ft.Container(width=8),
                 ft.Icon(icon_name, color=c["ACCENT"], size=26),
                 ft.Container(width=8),
-                ft.Text(title, size=20, weight=ft.FontWeight.BOLD, color=c["WHITE"]),
+                ft.Text(title, size=20, weight=ft.FontWeight.BOLD,
+                        color=c["WHITE"]),
             ],
         ),
     )
     return ft.Column(
         expand=True,
         scroll=ft.ScrollMode.AUTO,
-        controls=[header, ft.Container(height=16), *body_controls,
-                  ft.Container(height=20)],
+        controls=[header, ft.Container(height=16),
+                  *body_controls, ft.Container(height=20)],
     )
 
 
-def info_card(label, value, c):
+def info_card(label, value, c, page=None):
     return ft.Container(
         margin=ft.Margin(16, 0, 16, 10),
         padding=ft.Padding(16, 14, 16, 14),
@@ -65,7 +72,7 @@ def info_card(label, value, c):
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
                 ft.Text(label, color=c["GRAY"], size=13),
-                ft.Text(value, color=c["WHITE"], size=13,
+                ft.Text(str(value), color=c["WHITE"], size=13,
                         weight=ft.FontWeight.BOLD),
             ],
         ),
@@ -100,18 +107,19 @@ def date_field(label, c):
     return text_field(label, "DD/MM/AAAA", ft.Icons.CALENDAR_TODAY, c)
 
 
-def save_btn(c):
+def save_btn(c, on_click=None):
     return ft.Container(
         margin=ft.Margin(16, 8, 16, 0),
         height=44, border_radius=10,
         bgcolor=c["ACCENT"],
         alignment=ft.Alignment(0, 0),
+        on_click=on_click,
         content=ft.Text("Guardar", color="#FFFFFF", size=14,
                         weight=ft.FontWeight.BOLD),
     )
 
 
-def toggle_card(label, subtitle, value, c):
+def toggle_card(label, subtitle, value, c, on_change=None):
     return ft.Container(
         margin=ft.Margin(16, 0, 16, 10),
         padding=ft.Padding(16, 12, 16, 12),
@@ -125,7 +133,17 @@ def toggle_card(label, subtitle, value, c):
                     ft.Text(label, color=c["WHITE"], size=14),
                     ft.Text(subtitle, color=c["GRAY"], size=11),
                 ]),
-                ft.Switch(value=value, active_color=c["ACCENT"]),
+                ft.Switch(value=value, active_color=c["ACCENT"],
+                          on_change=on_change),
             ],
         ),
     )
+
+
+def snack(page, msg, error=False):
+    page.snack_bar = ft.SnackBar(
+        content=ft.Text(msg, color="#FFFFFF"),
+        bgcolor="#F44336" if error else "#4CAF50",
+    )
+    page.snack_bar.open = True
+    page.update()

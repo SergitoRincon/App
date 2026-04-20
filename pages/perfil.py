@@ -2,8 +2,12 @@ import flet as ft
 from pages.utils import build_subpage, info_card, section_title
 
 
-def build(page, C, go_home, navigate_to, USUARIO, PLACA, MARCA, MODELO, ANIO):
+def build(page, C, go_home, navigate_to, usuario_data: dict):
     c = C()
+    nombre = usuario_data.get("nombre", "Usuario")
+    email  = usuario_data.get("email", "")
+    desde  = usuario_data.get("creado_en", "")[:10] if usuario_data.get("creado_en") else ""
+
     return build_subpage(page, C, go_home, ft.Icons.PERSON, "Mi perfil", [
         ft.Container(
             alignment=ft.Alignment(0, 0),
@@ -17,17 +21,14 @@ def build(page, C, go_home, navigate_to, USUARIO, PLACA, MARCA, MODELO, ANIO):
                         content=ft.Icon(ft.Icons.PERSON, color="#FFFFFF", size=48),
                     ),
                     ft.Container(height=10),
-                    ft.Text(USUARIO, size=22, weight=ft.FontWeight.BOLD, color=c["WHITE"]),
+                    ft.Text(nombre, size=22, weight=ft.FontWeight.BOLD,
+                            color=c["WHITE"]),
                     ft.Text("Usuario MotoApp", size=13, color=c["GRAY"]),
                 ],
             ),
         ),
         section_title("INFORMACIÓN PERSONAL", c),
-        info_card("Nombre",    USUARIO,             c),
-        info_card("Vehículo",  f"{MARCA} {MODELO}", c),
-        info_card("Placa",     PLACA,               c),
-        info_card("Año",       ANIO,                c),
-        section_title("CUENTA", c),
-        info_card("Correo",        "usuario@email.com", c),
-        info_card("Miembro desde", "2024",              c),
+        info_card("Nombre",        nombre, c),
+        info_card("Correo",        email,  c),
+        info_card("Miembro desde", desde,  c),
     ])

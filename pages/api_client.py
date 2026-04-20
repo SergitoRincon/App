@@ -9,9 +9,8 @@ import httpx
 from pathlib import Path
 
 # ── URL del backend ────────────────────────────────────────────────
-#API_URL = "https://motoapp-backend.onrender.com"   # producción (Render gratis)
-API_URL = "https://motoapp-xjlt.onrender.com"
-API_URL = "http://localhost:8001"                 # desarrollo local
+API_URL = "https://motoapp-backend.onrender.com"   # producción (Render gratis)
+# API_URL = "http://localhost:8000"                 # desarrollo local
 
 TOKEN_FILE = Path.home() / ".motoapp_session.json"
 
