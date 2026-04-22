@@ -86,6 +86,7 @@ def main(page: ft.Page):
         page.theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE, use_material3=False)
 
     apply_theme()
+    init_loading(page)
 
     # ── Estado de sesión ─────────────────────────────
     usuario_data   = [{}]       # datos del usuario actual
@@ -110,9 +111,7 @@ def main(page: ft.Page):
                                  vehiculo_id,
                                  on_vehiculo_cambiado=_on_vehiculo_cambiado),
             "Configuracion": lambda: configuracion.build(page, C, go_home, navigate_to),
-            "Cerrar sesion": lambda: cerrar_sesion.build(
-                                 page, C, go_home, navigate_to,
-                                 on_logout=show_login),
+
         }
 
     # ── Páginas de mantenimiento ─────────────────────
@@ -188,6 +187,30 @@ def main(page: ft.Page):
             ]),
         )
 
+    def _top_menu_click(e, item):
+        from pages.utils import confirm_dialog
+        close_top_menu(e)
+        if item == "Cerrar sesion":
+            def hacer_logout():
+                show_loading(page, "Cerrando sesión...")
+                api.cerrar_sesion_local()
+                hide_loading(page)
+                show_login()
+            confirm_dialog(
+                page,
+                titulo="¿Cerrar sesión?",
+                mensaje="Se cerrará tu sesión actual.",
+                on_confirm=hacer_logout,
+                c=C(),
+                btn_confirm="Cerrar sesión",
+                btn_cancel="Cancelar",
+                danger=True,
+            )
+        else:
+            MENU_PAGES = mk_menu_pages()
+            if item in MENU_PAGES:
+                navigate_to(MENU_PAGES[item])
+
     def build_top_overlay():
         c = C()
         bg   = "#2C2C2C" if page.platform_brightness == ft.Brightness.DARK else "#FFFFFF"
@@ -201,10 +224,7 @@ def main(page: ft.Page):
             padding=ft.Padding(0, 8, 0, 8),
             content=ft.Column(tight=True, spacing=0, controls=[
                 ft.TextButton(width=180,
-                    on_click=lambda e, it=item: (
-                        close_top_menu(e),
-                        navigate_to(MENU_PAGES[it]) if it in MENU_PAGES else None,
-                    ),
+                    on_click=lambda e, it=item: _top_menu_click(e, it),
                     style=ft.ButtonStyle(
                         color=c["WHITE"],
                         bgcolor={ft.ControlState.HOVERED: "#2E4A90D9",
@@ -316,6 +336,18 @@ def main(page: ft.Page):
         ),
     )
 
+    def _mk_home_avatar(foto):
+        if not foto:
+            return ft.Icon("person", color="#FFFFFF", size=24)
+        if foto.startswith("data:"):
+            b64 = foto.split(",", 1)[1] if "," in foto else foto
+            return ft.Image(src_base64=b64, width=46, height=46,
+                           border_radius=23, fit=ft.ImageFit.COVER)
+        if foto.startswith("http"):
+            return ft.Image(src=foto, width=46, height=46,
+                           border_radius=23, fit=ft.ImageFit.COVER)
+        return ft.Icon("person", color="#FFFFFF", size=24)
+
     # ── Grid button ──────────────────────────────────
     def grid_btn(img_path, label, key):
         c = C()
@@ -355,7 +387,10 @@ def main(page: ft.Page):
     def build_home():
         c = C()
         w = W()
-        nombre = usuario_data[0].get("nombre", "")
+        from pages.perfil import primer_nombre
+        nombre_completo = usuario_data[0].get("nombre", "")
+        nombre = primer_nombre(nombre_completo) if nombre_completo else ""
+        foto_b64 = usuario_data[0].get("foto")
         vinfo  = vehiculo_info[0]
         placa  = vinfo.get("placa",  "Sin vehículo")
         marca  = vinfo.get("marca",  "")
@@ -375,8 +410,9 @@ def main(page: ft.Page):
                            controls=[
                         ft.Container(
                             width=46, height=46, border_radius=23,
-                            bgcolor=c["ACCENT"], alignment=ft.Alignment(0,0),
-                            content=ft.Icon("person", color="#FFFFFF", size=24),
+                            bgcolor=c["ACCENT"] if not foto_b64 else ft.Colors.TRANSPARENT,
+                            alignment=ft.Alignment(0,0),
+                            content=_mk_home_avatar(foto_b64),
                         ),
                         ft.Text(f"Hola, {nombre}!" if nombre else "Bienvenido",
                                 size=20, weight=ft.FontWeight.BOLD, color=c["WHITE"]),
@@ -490,23 +526,6 @@ def main(page: ft.Page):
                         break
 
     # ── Login / Logout ───────────────────────────────
-    def _cerrar_sesion_popup():
-        from pages.utils import confirm_dialog
-        def hacer_logout():
-            show_loading(page, "Cerrando sesión...")
-            api.cerrar_sesion_local()
-            hide_loading(page)
-            show_login()
-        confirm_dialog(
-            page,
-            titulo="¿Cerrar sesión?",
-            mensaje="Se cerrará tu sesión actual.",
-            on_confirm=hacer_logout,
-            c=C(),
-            btn_confirm="Cerrar sesión",
-            danger=True,
-        )
-
     def show_login():
         logged_in[0] = False
         page.bottom_appbar.visible = False
@@ -553,6 +572,9 @@ def main(page: ft.Page):
         if logged_in[0]:
             _refresh_overlays()
             switch(current_idx[0])
+        else:
+            content.content = login_page.build(page, C, on_login_success)
+            page.update()
 
     page.on_platform_brightness_change = on_brightness_change
     page.on_resized = lambda e: (

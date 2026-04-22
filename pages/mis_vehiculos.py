@@ -1,6 +1,6 @@
 import flet as ft
 from pages.utils import (build_subpage, section_title, snack,
-                          show_loading, hide_loading, confirm_dialog)
+                          show_loading, hide_loading, confirm_dialog, mostrar_exito)
 import api_client as api
 
 
@@ -161,7 +161,7 @@ def build(page, C, go_home, navigate_to, vehiculo_actual_id: list,
             vdata = res["data"]
             vehiculo_actual_id[0] = vid
             placa_f.value = marca_f.value = modelo_f.value = anio_f.value = ""
-            snack(page, "Vehículo agregado ✓")
+            mostrar_exito(page, "Vehículo agregado ✓")
             if on_vehiculo_cambiado:
                 on_vehiculo_cambiado(vid, vdata)
             cargar()

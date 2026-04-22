@@ -211,3 +211,27 @@ def save_btn(c, on_click=None, label="Guardar"):
         content=ft.Text(label, color="#FFFFFF", size=14,
                         weight=ft.FontWeight.BOLD),
     )
+
+
+def mostrar_exito(page, msg="Guardado correctamente ✓"):
+    """Muestra un SnackBar verde que desaparece en 1 segundo."""
+    import threading
+    sb = ft.SnackBar(
+        content=ft.Row(controls=[
+            ft.Icon(ft.Icons.CHECK_CIRCLE, color="#FFFFFF", size=18),
+            ft.Container(width=8),
+            ft.Text(msg, color="#FFFFFF", size=13),
+        ]),
+        bgcolor="#4CAF50",
+        open=True,
+    )
+    page.overlay.append(sb)
+    page.update()
+    def quitar():
+        try:
+            sb.open = False
+            page.overlay.remove(sb)
+            page.update()
+        except Exception:
+            pass
+    threading.Thread(target=lambda: (__import__('time').sleep(1), quitar())).start()

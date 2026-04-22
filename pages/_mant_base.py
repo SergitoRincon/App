@@ -1,5 +1,5 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, snack, show_loading, hide_loading
+from pages.utils import build_subpage, section_title, snack, show_loading, hide_loading, mostrar_exito
 import api_client as api
 
 
@@ -41,7 +41,7 @@ def build_mant_page(page, C, go_home, navigate_to,
         res = api.guardar_modulo(vid, modulo_key, datos)
         hide_loading(page)
         if res["ok"]:
-            snack(page, "Guardado correctamente ✓")
+            mostrar_exito(page)
         else:
             snack(page, res.get("error", "Error al guardar"), error=True)
 

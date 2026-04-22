@@ -1,5 +1,5 @@
 import flet as ft
-from pages.utils import build_subpage, section_title, snack
+from pages.utils import build_subpage, mostrar_exito, section_title, snack
 import api_client as api
 
 
@@ -81,7 +81,7 @@ def build(page, C, go_home, navigate_to, vehiculo_id_ref):
         }
         res = api.guardar_modulo(vid, "liquido_refrigerante", datos)
         if res["ok"]:
-            snack(page, "Guardado correctamente ✓")
+            mostrar_exito(page)
         else:
             snack(page, res.get("error", "Error"), error=True)
 
