@@ -69,11 +69,14 @@ DARK = {
 
 
 def main(page: ft.Page):
-    page.title         = "MotoApp"
+    page.title = "MotoApp"
+    page.padding = ft.padding.only(top=44, bottom=0)
+    page.scroll = None
+    page.auto_scroll = False
+    page.spacing = 0
     page.window.width  = 390
     page.window.height = 844
     page.window.resizable = False
-    page.padding = ft.padding.only(bottom=70)
 
     def C():
         return DARK if page.platform_brightness == ft.Brightness.DARK else LIGHT
@@ -157,34 +160,76 @@ def main(page: ft.Page):
         c = C()
         bg   = "#2C2C2C" if page.platform_brightness == ft.Brightness.DARK else "#FFFFFF"
         dark = page.platform_brightness == ft.Brightness.DARK
+        vehiculos_lista = []
         if api.sesion_activa():
-            veh    = api.get_vehiculos()
-            placas = [v["placa"] for v in veh["data"]] if veh["ok"] else []
+            veh = api.get_vehiculos()
+            vehiculos_lista = veh["data"] if veh["ok"] else []
+        
+        def seleccionar_vehiculo(e, v):
+            close_menu(e)
+            _on_vehiculo_cambiado(v["id"], v)
+            go_home()
+
+        if not vehiculos_lista:
+            items = [ft.TextButton(
+                width=180,
+                on_click=lambda e: (close_menu(e), navigate_to(
+                    lambda: mis_vehiculos.build(page, C, go_home, navigate_to, vehiculo_id, _on_vehiculo_cambiado)
+                )),
+                style=ft.ButtonStyle(
+                    color=c["WHITE"],
+                    bgcolor={ft.ControlState.HOVERED: "#2E4A90D9",
+                             ft.ControlState.DEFAULT: bg},
+                    padding=ft.Padding(16, 10, 16, 10),
+                    shape=ft.RoundedRectangleBorder(radius=0),
+                ),
+                content=ft.Text("+ Agregar vehículo", color=c["ACCENT"], size=14),
+            )]
         else:
-            placas = []
-        if not placas:
-            placas = ["Sin vehículos"]
-        return ft.Container(
-            right=5, bottom=5, width=180, bgcolor=bg, border_radius=10,
-            border=None if dark else ft.border.all(1, "#CCCCCC"),
-            shadow=None if dark else ft.BoxShadow(
-                blur_radius=12, color="#22000000", offset=ft.Offset(0, 4)),
-            padding=ft.Padding(0, 8, 0, 8),
-            content=ft.Column(tight=True, spacing=0, controls=[
-                ft.TextButton(width=180, on_click=lambda e, p=pl: close_menu(e),
+            items = []
+            for v in vehiculos_lista:
+                es_activo = v["id"] == vehiculo_id[0]
+                items.append(ft.TextButton(
+                    width=180,
+                    on_click=lambda e, vv=v: seleccionar_vehiculo(e, vv),
                     style=ft.ButtonStyle(
                         color=c["WHITE"],
                         bgcolor={ft.ControlState.HOVERED: "#2E4A90D9",
-                                 ft.ControlState.DEFAULT: bg},
+                                 ft.ControlState.DEFAULT: "#1E4A90D9" if es_activo else bg},
                         padding=ft.Padding(16, 10, 16, 10),
                         shape=ft.RoundedRectangleBorder(radius=0),
                         overlay_color="#2E4A90D9",
                     ),
-                    content=ft.Text(pl, color=c["WHITE"], size=14,
-                                    text_align=ft.TextAlign.LEFT),
-                )
-                for pl in placas
-            ]),
+                    content=ft.Row(controls=[
+                        ft.Text(v["placa"], color=c["WHITE"], size=14,
+                                text_align=ft.TextAlign.LEFT, expand=True),
+                        ft.Icon(ft.Icons.CHECK, color=c["ACCENT"], size=14)
+                        if es_activo else ft.Container(width=14),
+                    ]),
+                ))
+            items.append(ft.Divider(height=1, color=c["BORDER"]))
+            items.append(ft.TextButton(
+                width=180,
+                on_click=lambda e: (close_menu(e), navigate_to(
+                    lambda: mis_vehiculos.build(page, C, go_home, navigate_to, vehiculo_id, _on_vehiculo_cambiado)
+                )),
+                style=ft.ButtonStyle(
+                    color=c["ACCENT"],
+                    bgcolor={ft.ControlState.HOVERED: "#2E4A90D9",
+                             ft.ControlState.DEFAULT: bg},
+                    padding=ft.Padding(16, 10, 16, 10),
+                    shape=ft.RoundedRectangleBorder(radius=0),
+                ),
+                content=ft.Text("Administrar vehículos", color=c["ACCENT"], size=13),
+            ))
+
+        return ft.Container(
+            right=5, bottom=5, width=200, bgcolor=bg, border_radius=10,
+            border=None if dark else ft.border.all(1, "#CCCCCC"),
+            shadow=None if dark else ft.BoxShadow(
+                blur_radius=12, color="#22000000", offset=ft.Offset(0, 4)),
+            padding=ft.Padding(0, 8, 0, 8),
+            content=ft.Column(tight=True, spacing=0, controls=items),
         )
 
     def _top_menu_click(e, item):
@@ -329,7 +374,7 @@ def main(page: ft.Page):
     )
 
     page.bottom_appbar = ft.BottomAppBar(
-        bgcolor=C()["BOTTOM"], height=70,
+        bgcolor=C()["BOTTOM"], height=80,
         content=ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[*nav_btns, ft.Container(expand=True), extra_btn],
@@ -436,6 +481,7 @@ def main(page: ft.Page):
             padding=ft.Padding(20,14,20,14),
             border_radius=16, bgcolor=c["CARD"],
             border=ft.border.all(1, c["BORDER"]),
+            expand=True,
             on_click=lambda e: navigate_to(
                 lambda: mis_vehiculos.build(page, C, go_home, navigate_to, vehiculo_id, _on_vehiculo_cambiado)),
             content=ft.Column(
@@ -481,7 +527,10 @@ def main(page: ft.Page):
 
         return ft.Column(
             scroll=ft.ScrollMode.AUTO,
-            controls=[top, ft.Container(height=6), card, ft.Container(height=4),
+            expand=True,
+            controls=[top, ft.Container(height=6),
+                      ft.Row(controls=[card], expand=False),
+                      ft.Container(height=4),
                       *section_controls, ft.Container(height=20)],
         )
 
@@ -532,24 +581,22 @@ def main(page: ft.Page):
         vehicle_overlay.visible    = False
         top_overlay.visible        = False
         content.bgcolor = C()["BG"]
-        content.content = login_page.build(page, C, on_login_success)
+        def ir_recuperar():
+            from pages import recuperar_password
+            content.content = recuperar_password.build(page, C, show_login)
+            page.update()
+        content.content = login_page.build(page, C, on_login_success, on_recuperar=ir_recuperar)
         page.update()
 
     def on_login_success():
         logged_in[0] = True
-        show_loading(page, "Cargando tu perfil...")
-        # Cargar datos del usuario
         u = api.get_perfil()
         if u["ok"]:
             usuario_data[0] = u["data"]
-
-        # Cargar primer vehículo
         veh = api.get_vehiculos()
         if veh["ok"] and veh["data"]:
             vehiculo_id[0]   = veh["data"][0]["id"]
             vehiculo_info[0] = veh["data"][0]
-
-        hide_loading(page)
         page.bottom_appbar.visible = True
         content.bgcolor = C()["BG"]
         content.content = build_home()
@@ -561,7 +608,11 @@ def main(page: ft.Page):
         on_login_success()
     else:
         page.bottom_appbar.visible = False
-        content.content = login_page.build(page, C, on_login_success)
+        def ir_recuperar():
+            from pages import recuperar_password
+            content.content = recuperar_password.build(page, C, show_login)
+            page.update()
+        content.content = login_page.build(page, C, on_login_success, on_recuperar=ir_recuperar)
         page.update()
 
     def on_brightness_change(e):
@@ -573,7 +624,7 @@ def main(page: ft.Page):
             _refresh_overlays()
             switch(current_idx[0])
         else:
-            content.content = login_page.build(page, C, on_login_success)
+            content.content = login_page.build(page, C, on_login_success, on_recuperar=ir_recuperar)
             page.update()
 
     page.on_platform_brightness_change = on_brightness_change

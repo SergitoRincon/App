@@ -61,6 +61,19 @@ def build(page, C, go_home, navigate_to):
             toggle_row("Compartir ubicación",
                        "Para mostrar talleres cercanos",
                        "compartir_ubicacion"),
+            section_title("SEGURIDAD", c),
+            ft.Container(
+                margin=ft.Margin(16, 0, 16, 10),
+                height=46, border_radius=10,
+                bgcolor=c["CARD"],
+                border=ft.border.all(1, c["ACCENT"]),
+                alignment=ft.Alignment(0, 0),
+                on_click=lambda e: navigate_to(
+                    lambda: __import__("pages.cambiar_password", fromlist=["build"]).build(page, C, go_home, navigate_to)
+                ),
+                content=ft.Text("Cambiar contraseña", color=c["ACCENT"],
+                                size=14, weight=ft.FontWeight.BOLD),
+            ),
             ft.Container(height=20),
         ]
         page.update()

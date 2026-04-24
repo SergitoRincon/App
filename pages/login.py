@@ -1,8 +1,7 @@
 import flet as ft
-from pages.utils import show_loading, hide_loading
 
 
-def build(page: ft.Page, C, on_login_success):
+def build(page: ft.Page, C, on_login_success, on_recuperar=None):
     c = C()
     modo = ["login"]
 
@@ -62,32 +61,22 @@ def build(page: ft.Page, C, on_login_success):
 
     def on_submit(e):
         import api_client as api
-        error_t.value = ""
-
         em = email_f.value.strip()
         pw = pass_f.value.strip()
-
+        error_t.value = ""
         if not em or not pw:
             error_t.value = "Completa todos los campos"
             page.update()
             return
-
-        msg = "Iniciando sesión..." if modo[0] == "login" else "Creando cuenta..."
-        show_loading(page, msg)
-
         if modo[0] == "login":
             res = api.login(em, pw)
         else:
             nm = nombre_f.value.strip()
             if not nm:
-                hide_loading(page)
                 error_t.value = "Ingresa tu nombre"
                 page.update()
                 return
             res = api.registrar(nm, em, pw)
-
-        hide_loading(page)
-
         if res["ok"]:
             on_login_success()
         else:
@@ -112,7 +101,6 @@ def build(page: ft.Page, C, on_login_success):
             ft.Container(height=4),
             sub_t,
             ft.Container(height=20),
-            # Card con expand para ocupar todo el ancho menos márgenes
             ft.Container(
                 margin=ft.Margin(24, 0, 24, 0),
                 padding=ft.Padding(20, 20, 20, 20),
@@ -137,6 +125,14 @@ def build(page: ft.Page, C, on_login_success):
                             alignment=ft.Alignment(0, 0),
                             on_click=cambiar_modo,
                             content=toggle_t,
+                        ),
+                        ft.Container(
+                            alignment=ft.Alignment(0, 0),
+                            on_click=lambda e: on_recuperar() if on_recuperar else None,
+                            content=ft.Text(
+                                "¿Olvidaste tu contraseña?",
+                                color=c["GRAY"], size=12,
+                                text_align=ft.TextAlign.CENTER),
                         ),
                     ],
                 ),
